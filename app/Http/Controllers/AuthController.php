@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Profile;
 use App\Models\Student;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -37,36 +39,35 @@ class AuthController extends Controller
         return view('auth.register');
     }
 
-    public function register(Request $request)
+   public function register(Request $request)
 {
     $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users',
+        'name'     => 'required|string|max:255',
+        'email'    => 'required|string|email|max:255|unique:users,email',
         'password' => 'required|string|min:8|confirmed',
-        'role' => 'required|in:student,teacher,hrd',
-        // Jika role siswa, nisn wajib & unique. Jika hrd/teacher, boleh kosong/nullable
-        'nisn' => $request->role === 'student' ? 'required|string|unique:students,nisn' : 'nullable',
-        'class' => $request->role === 'student' ? 'required|string' : 'nullable',
+        'age'      => 'required|integer|min:1',
+        'school'   => 'required|string|max:255',
+        'class'    => 'required|string|max:50', // Validasi kelas
     ]);
 
-    $user = User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'password' => Hash::make($request->password),
-        'role' => $request->role,
-    ]);
-
-    if ($request->role === 'student') {
-        Student::create([
-            'user_id' => $user->id,
-            'nisn' => $request->nisn,
-            'class' => $request->class,
+    DB::transaction(function () use ($request) {
+        $user = User::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
+            'role'     => 'student',
         ]);
-    }
 
-    return redirect()->route('login')->with('success', 'Registrasi berhasil! Silakan masuk.');
+        Profile::create([
+            'user_id' => $user->id,
+            'age'     => $request->age,
+            'school'  => $request->school,
+            'class'   => $request->class, // Simpan kelas
+        ]);
+    });
+
+    return redirect()->route('login')->with('success', 'Registrasi akun berhasil! Silakan masuk.');
 }
-
     public function logout(Request $request)
     {
         Auth::logout();

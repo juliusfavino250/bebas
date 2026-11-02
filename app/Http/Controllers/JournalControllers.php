@@ -2,38 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Journal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Journal;
-use App\Models\Student;
 
-class JournalController extends Controller
+class StudentJournalController extends Controller
 {
+    // Menampilkan daftar jurnal milik siswa yang sedang login
     public function index()
     {
-        $student = Student::where('user_id', Auth::id())->first();
-        $journals = Journal::where('student_id', $student->id ?? null)->latest()->get();
-
+        $journals = Journal::where('user_id', Auth::id())->orderBy('date', 'desc')->get();
         return view('student.journals.index', compact('journals'));
     }
 
+    // Menyimpan jurnal baru
     public function store(Request $request)
     {
         $request->validate([
             'date' => 'required|date',
             'activity' => 'required|string',
-            'problem_faced' => 'nullable|string',
         ]);
-
-        $student = Student::where('user_id', Auth::id())->first();
 
         Journal::create([
-            'student_id' => $student->id,
+            'user_id' => Auth::id(),
             'date' => $request->date,
             'activity' => $request->activity,
-            'problem_faced' => $request->problem_faced,
+            'status' => 'pending',
         ]);
 
-        return redirect()->back()->with('success', 'Jurnal harian berhasil dikirim!');
+        return redirect()->route('student.journals.index')->with('success', 'Jurnal harian berhasil ditambahkan!');
     }
 }
