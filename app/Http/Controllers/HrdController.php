@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CompanyRequest;
 use App\Models\RequestChat;
+use App\Models\PklJournal;
 use Illuminate\Http\Request;
 
 class HrdController extends Controller
@@ -56,5 +57,34 @@ class HrdController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Pesan terkirim!');
+    }
+
+    // ==========================================
+    // TAMBAHAN FITUR MANAJEMEN JURNAL SISWA OLEH HRD
+    // ==========================================
+
+    public function journalsIndex()
+{
+    $hrdCompany = auth()->user()->company;
+
+    $journals = collect();
+    if ($hrdCompany) {
+        // Ambil jurnal dari siswa yang memiliki permohonan PKL 'approved' di perusahaan HRD ini
+        $journals = PklJournal::whereHas('student.companyRequest', function($query) use ($hrdCompany) {
+            $query->where('company_id', $hrdCompany->id)->where('status', 'approved');
+        })->with(['student.profile'])->orderBy('date', 'asc')->get();
+    }
+
+    return view('hrd.journals.index', compact('journals', 'hrdCompany'));
+}
+    public function approveJournal($id)
+    {
+        $journal = PklJournal::findOrFail($id);
+        
+        $journal->update([
+            'status' => 'hrd_approved'
+        ]);
+
+        return redirect()->back()->with('success', 'Jurnal kegiatan siswa berhasil disetujui!');
     }
 }

@@ -45,9 +45,10 @@
                 @endif
             </div>
 
-            <!-- Menu Cepat / Navigasi Request Guru -->
+            <!-- Menu Cepat / Navigasi HRD -->
             @if($company)
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Menu 1: Request Guru -->
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 flex flex-col justify-between">
                         <div>
                             <h4 class="font-bold text-slate-800 text-lg">📩 Pengajuan / Request Guru</h4>
@@ -59,7 +60,24 @@
                             </a>
                         </div>
                     </div>
-                </div>
+
+                    <!-- Menu 2: Tombol Baru Cek Jurnal Siswa -->
+                    <!-- Menu 2: Tombol Cek Jurnal Siswa -->
+<div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 flex flex-col justify-between border-2 border-indigo-100">
+    <div>
+        <div class="flex items-center gap-2">
+            <h4 class="font-bold text-slate-800 text-lg">📖 Jurnal Kegiatan Siswa</h4>
+            <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Fitur Baru</span>
+        </div>
+        <p class="text-xs text-slate-500 mt-1">Periksa dan berikan persetujuan (approval) pada lembar jurnal harian siswa PKL yang telah dikirim.</p>
+    </div>
+    <div class="mt-6">
+        <!-- Gunakan URL langsung '/hrd/journals' jika namanya masih bermasalah dengan cache rute -->
+        <a href="{{ url('/hrd/journals') }}" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-5 py-2.5 rounded-lg transition shadow-sm">
+            Cek & Validasi Jurnal Siswa 🚀
+        </a>
+    </div>
+</div>
             @endif
 
         </div>

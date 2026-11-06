@@ -63,4 +63,8 @@ class User extends Authenticatable
     {
         return $this->hasOne(Profile::class, 'user_id');
     }
+    public function companyRequest()
+{
+    return $this->hasOne(CompanyRequest::class, 'student_id');
+}
 }

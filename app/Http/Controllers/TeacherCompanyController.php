@@ -4,27 +4,35 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use App\Models\CompanyRequest;
-use App\Models\RequestChat;
 use App\Models\User;
 use App\Models\Profile;
+use App\Models\RequestChat;
 use Illuminate\Http\Request;
 
 class TeacherCompanyController extends Controller
 {
-    // Menampilkan daftar perusahaan untuk diajukan oleh guru
     public function index()
     {
         $companies = Company::all();
-        return view('teacher.companies.index', compact('companies'));
+        
+        // Ambil juga data students agar view index.blade.php tidak error jika menampilkan form assign
+        $students = User::where('role', 'student')->with('profile')->get();
+
+        $schools = [
+            'SMK Negeri 1',
+            'SMK Negeri 2',
+            'SMK Swasta Mandiri',
+        ];
+
+        return view('teacher.companies.index', compact('companies', 'students', 'schools'));
     }
 
-    // Menampilkan halaman pencarian siswa & pencarian perusahaan untuk pengajuan PKL
     public function createRequest(Request $request)
     {
         $search = $request->input('search');
         $schoolFilter = $request->input('school');
 
-        // Filter daftar siswa berdasarkan nama atau asal sekolah
+        // Filter siswa berdasarkan nama dan asal sekolah
         $students = User::where('role', 'student')
             ->with('profile')
             ->when($search, function ($query, $search) {
@@ -32,19 +40,24 @@ class TeacherCompanyController extends Controller
             })
             ->when($schoolFilter, function ($query, $school) {
                 return $query->whereHas('profile', function ($q) use ($school) {
-                    $q->where('school', 'like', "%{$school}%");
+                    $q->where('school', $school);
                 });
             })
             ->get();
 
         $companies = Company::all();
-        // Mengambil daftar unik asal sekolah dari profil siswa untuk opsi filter dropdown
-        $schools = Profile::whereNotNull('school')->distinct()->pluck('school');
+
+        // Opsi pilihan sekolah dibuat fix (mirip role) agar tidak pernah kosong
+        $schools = [
+            'SMK Negeri 1',
+            'SMK Negeri 2',
+            'SMK Swasta Mandiri',
+            // Tambahkan nama sekolah mitra lainnya di sini jika ada
+        ];
 
         return view('teacher.companies.assign', compact('students', 'companies', 'schools', 'search', 'schoolFilter'));
     }
 
-    // Menyimpan pengajuan kerja sama & siswa yang dipilih (bisa melalui route perusahaan langsung atau route assign)
     public function storeRequest(Request $request, Company $company = null)
     {
         $request->validate([
@@ -53,7 +66,6 @@ class TeacherCompanyController extends Controller
             'company_id' => 'nullable|exists:companies,id',
         ]);
 
-        // Ambil company_id dari parameter route (jika ada) atau dari body request
         $companyId = $company ? $company->id : $request->company_id;
 
         if (!$companyId) {
@@ -71,7 +83,6 @@ class TeacherCompanyController extends Controller
         return redirect()->route('teacher.companies.my-requests')->with('success', 'Pengajuan siswa ke perusahaan berhasil dikirim!');
     }
 
-    // Menampilkan daftar request yang dikirim guru beserta relasi siswa & profilnya
     public function myRequests()
     {
         $requests = CompanyRequest::where('teacher_id', auth()->id())
@@ -82,7 +93,6 @@ class TeacherCompanyController extends Controller
         return view('teacher.companies.my-requests', compact('requests'));
     }
 
-    // Menampilkan halaman chat detail untuk Guru
     public function showChat(CompanyRequest $companyRequest)
     {
         if ($companyRequest->teacher_id !== auth()->id()) {
@@ -90,11 +100,9 @@ class TeacherCompanyController extends Controller
         }
 
         $companyRequest->load(['company', 'teacher', 'student.profile', 'chats.sender']);
-        
         return view('teacher.companies.chat', compact('companyRequest'));
     }
 
-    // Menyimpan pesan chat dari Guru
     public function storeChat(Request $request, CompanyRequest $companyRequest)
     {
         if ($companyRequest->teacher_id !== auth()->id()) {

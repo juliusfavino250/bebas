@@ -9,8 +9,18 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
             @if(session('success'))
-                <div class="p-4 bg-emerald-100 text-emerald-800 rounded-lg text-sm font-semibold">
+                <div class="p-4 bg-emerald-100 text-emerald-800 rounded-lg text-sm font-semibold mb-4">
                     {{ session('success') }}
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div class="p-4 bg-red-100 text-red-800 rounded-lg text-sm font-semibold mb-4">
+                    <ul class="list-disc pl-5">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 </div>
             @endif
 
@@ -23,11 +33,13 @@
                         <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="Ketik nama siswa..." class="w-full text-xs rounded-lg border-slate-300">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Asal Sekolah:</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Pilih Asal Sekolah:</label>
                         <select name="school" class="w-full text-xs rounded-lg border-slate-300">
                             <option value="">-- Semua Sekolah --</option>
                             @foreach($schools as $school)
-                                <option value="{{ $school }}" {{ ($schoolFilter == $school) ? 'selected' : '' }}>{{ $school }}</option>
+                                <option value="{{ $school }}" {{ ($schoolFilter == $school) ? 'selected' : '' }}>
+                                    {{ $school }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -51,19 +63,19 @@
                         <select name="company_id" required class="w-full text-sm rounded-lg border-slate-300">
                             <option value="">-- Pilih Perusahaan Mitra --</option>
                             @foreach($companies as $company)
-                                <option value="{{ $company->id }}">{{ $company->name }} (📍 {{ $company->address ?? 'Lokasi tidak ada' }})</option>
+                                <option value="{{ $company->id }}">{{ $company->name }} (📍 {{ $company->address ?? 'Lokasi tidak tersedia' }})</option>
                             @endforeach
                         </select>
                     </div>
 
-                    <!-- Pilih Siswa (Hasil Filter) -->
+                    <!-- Pilih Siswa (Menampilkan Nama, Kelas, dan Asal Sekolah) -->
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Pilih Siswa yang Ditemukan <span class="text-red-500">*</span></label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Pilih Siswa <span class="text-red-500">*</span></label>
                         <select name="student_id" required class="w-full text-sm rounded-lg border-slate-300">
                             <option value="">-- Pilih Siswa --</option>
                             @forelse($students as $student)
                                 <option value="{{ $student->id }}">
-                                    {{ $student->name }} — Sekolah: {{ $student->profile->school ?? '-' }} (Kelas: {{ $student->profile->class ?? '-' }})
+                                    {{ $student->name }} — Kelas: {{ $student->profile->class ?? 'Belum diisi' }} | Sekolah: {{ $student->profile->school ?? 'Belum diisi' }}
                                 </option>
                             @empty
                                 <option value="" disabled>Tidak ada siswa ditemukan dengan filter tersebut.</option>
@@ -73,8 +85,8 @@
 
                     <!-- Pesan / Catatan -->
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Pesan / Catatan Pengantar ke HRD <span class="text-red-500">*</span></label>
-                        <textarea name="message" rows="3" required placeholder="Tuliskan catatan rekomendasi siswa untuk HRD..." class="w-full text-sm rounded-lg border-slate-300"></textarea>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Pesan / Catatan Rekomendasi Guru <span class="text-red-500">*</span></label>
+                        <textarea name="message" rows="3" required placeholder="Tuliskan alasan pengajuan atau deskripsi siswa untuk HRD..." class="w-full text-sm rounded-lg border-slate-300"></textarea>
                     </div>
 
                     <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs py-3 rounded-lg transition shadow-sm">

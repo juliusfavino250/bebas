@@ -40,11 +40,32 @@
 </div>
 
 <!-- Kelas (Ditambahkan kembali) -->
-<div>
+<!-- Dropdown Pilihan Kelas (Fixed List) -->
+<div class="mt-4">
     <label class="block text-xs font-semibold text-slate-600 mb-1">Kelas <span class="text-red-500">*</span></label>
-    <input type="text" name="class" value="{{ old('class') }}" required placeholder="Contoh: XII RPL 1" class="w-full text-sm rounded-lg border-slate-300">
+    <select name="class" required class="w-full text-sm rounded-lg border-slate-300">
+        <option value="">-- Pilih Kelas --</option>
+        <option value="11 RPL 1">11 RPL 1</option>
+        <option value="11 RPL 2">11 RPL 2</option>
+        <option value="11 AKL">11 AKL</option>
+        <option value="11 MPLB">11 MPLB</option>
+        <option value="12 RPL 1">12 RPL 1</option>
+        <option value="12 RPL 2">12 RPL 2</option>
+        <option value="12 AKL">12 AKL</option>
+        <option value="12 MPLB">12 MPLB</option>
+    </select>
 </div>
 
+<!-- Dropdown Pilihan Asal Sekolah (Fixed List) -->
+<div class="mt-4">
+    <label class="block text-xs font-semibold text-slate-600 mb-1">Asal Sekolah <span class="text-red-500">*</span></label>
+    <select name="school" required class="w-full text-sm rounded-lg border-slate-300">
+        <option value="">-- Pilih Sekolah --</option>
+        <option value="SMK Negeri 1">SMK Negeri 1</option>
+        <option value="SMK Negeri 2">SMK Negeri 2</option>
+        <option value="SMK Swasta Mandiri">SMK Swasta</option>
+    </select>
+</div>
         <!-- Password -->
         <div>
             <label class="block text-xs font-semibold text-slate-600 mb-1">Password</label>

@@ -12,6 +12,7 @@ class CompanyRequest extends Model
     protected $fillable = [
         'company_id',
         'teacher_id',
+        'student_id',
         'message',
         'status',
     ];
@@ -26,9 +27,13 @@ class CompanyRequest extends Model
         return $this->belongsTo(User::class, 'teacher_id');
     }
 
+    public function student()
+    {
+        return $this->belongsTo(User::class, 'student_id');
+    }
+
     public function chats()
-{
-    return $this->hasMany(RequestChat::class);
-    return $this->hasMany(RequestChat::class, 'company_request_id');
-}
+    {
+        return $this->hasMany(RequestChat::class, 'company_request_id');
+    }
 }

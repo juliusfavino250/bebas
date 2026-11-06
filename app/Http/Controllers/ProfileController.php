@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Http\Controllers;
 
 use App\Models\Company;
@@ -36,6 +37,19 @@ class ProfileController extends Controller
             $validated
         );
 
-        return redirect()->back()->with('success', 'Profil berhasil diperbarui!');
+        // Redirect dinamis berdasarkan role masing-masing setelah update profil
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.users.index')->with('success', 'Profil berhasil diperbarui!');
+        } 
+        elseif ($user->role === 'teacher') {
+            return redirect()->route('teacher.dashboard')->with('success', 'Profil berhasil diperbarui!');
+        } 
+        elseif ($user->role === 'HRD') {
+            return redirect()->route('hrd.dashboard')->with('success', 'Profil berhasil diperbarui!');
+        } 
+        else {
+            // Default untuk Student / Siswa
+            return redirect()->route('dashboard')->with('success', 'Profil berhasil diperbarui!');
+        }
     }
 }
